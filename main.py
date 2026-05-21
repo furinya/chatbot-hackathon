@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from app.parser import parse_message
-from app.database import leads
-from app.sessions import sessions
-from app.history import history
-from app.required_fields import required_fields
-from app.status import statuses, status_options
-from app.rules import optional_fields
+from parser import parse_message
+from database import leads
+from sessions import sessions
+from history import history
+from required_fields import required_fields
+from status import statuses, status_options
+from rules import optional_fields
 
 app = FastAPI()
 
