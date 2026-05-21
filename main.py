@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Header, HTTPException
 from pydantic import BaseModel
+import os
 
 from parser import parse_message
 from database import leads
@@ -11,12 +12,18 @@ from rules import optional_fields
 
 app = FastAPI()
 
+# TOKEN VIA RAILWAY VARIABLES
+API_TOKEN = os.getenv("API_TOKEN")
+
 
 class ChatRequest(BaseModel):
     user: str
     message: str
 
 
+# =========================
+# CHAT INTERNO
+# =========================
 @app.post("/chat")
 def chat(data: ChatRequest):
 
@@ -290,6 +297,39 @@ def chat(data: ChatRequest):
     }
 
 
+# =========================
+# WEBHOOK EXTERNO
+# =========================
+@app.post("/webhook")
+async def webhook(
+    request: Request,
+    authorization: str = Header(None)
+):
+
+    # VALIDA TOKEN
+    if authorization != API_TOKEN:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Token inválido"
+        )
+
+    body = await request.json()
+
+    user = body.get("user", "external_user")
+    message = body.get("message", "")
+
+    response = chat(ChatRequest(
+        user=user,
+        message=message
+    ))
+
+    return response
+
+
+# =========================
+# HISTÓRICO
+# =========================
 @app.get("/history")
 def get_history():
 
