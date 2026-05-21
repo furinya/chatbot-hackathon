@@ -1,0 +1,1117 @@
+
+teste.html
+Fazer login
+Página
+1
+/
+1
+100%
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams CRM Simulator</title>
+    <style>
+        :root {
+            --teams-purple: #5b5fc7;
+            --teams-dark: #201f1f;
+            --teams-chat-bg: #292929;
+            --teams-sidebar: #1f1f1f;
+            --teams-text: #f5f5f5;
+            --teams-gray: #333333;
+            --teams-border: #424242;
+            --teams-error-bg: #422222;
+            --teams-error-border: #e85c5c;
+            --teams-warning-bg: #473417;
+            --teams-warning-border: #f0a138;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #111;
+            color: var(--teams-text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Barra Lateral de Ícones */
+        .teams-nav {
+            width: 68px;
+            background-color: var(--teams-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 15px;
+            border-right: 1px solid var(--teams-border);
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            color: #adadad;
+        }
+
+        .nav-item.active {
+            color: var(--teams-purple);
+            border-left: 3px solid var(--teams-purple);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* Lista de Chats */
+        .teams-channels {
+            width: 250px;
+            background-color: var(--teams-sidebar);
+            border-right: 1px solid var(--teams-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channels-header {
+            padding: 20px 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--teams-border);
+        }
+
+        .chat-list-item {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--teams-gray);
+            border-left: 4px solid var(--teams-purple);
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--teams-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Área do Chat */
+        .teams-chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--teams-chat-bg);
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background-color: var(--teams-sidebar);
+            border-bottom: 1px solid var(--teams-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            background-color: var(--teams-gray);
+            padding: 12px 16px;
+            border-radius: 8px;
+            line-height: 1.4;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        /* Estilizações de Destaque para Erros Visuais no Chat */
+        .message.bot-error .message-content {
+            background-color: var(--teams-error-bg);
+            border: 1px solid var(--teams-error-border);
+            box-shadow: 0 0 8px rgba(232, 92, 92, 0.2);
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .message.bot-warning .message-content {
+            background-color: var(--teams-warning-bg);
+            border: 1px solid var(--teams-warning-border);
+            box-shadow: 0 0 8px rgba(240, 161, 56, 0.2);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .message.user .message-content {
+            background-color: #3b3a3a;
+            border-right: 3px solid var(--teams-purple);
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background-color: var(--teams-chat-bg);
+            border-top: 1px solid var(--teams-border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--teams-sidebar);
+            border: 1px solid var(--teams-border);
+            border-radius: 4px;
+            color: white;
+            outline: none;
+        }
+
+        .chat-input-area input:focus {
+            border-color: var(--teams-purple);
+        }
+
+        .chat-input-area button {
+            padding: 0 20px;
+            background-color: var(--teams-purple);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .chat-input-area button:hover {
+            background-color: #4b4fa7;
+        }
+
+        /* Painel Lateral Direito */
+        .right-panel {
+            width: 420px;
+            background-color: var(--teams-sidebar);
+            border-left: 1px solid var(--teams-border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Seção CRM */
+        .crm-section {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 2px solid var(--teams-border);
+            overflow: hidden;
+        }
+
+        .crm-header, .logs-header {
+            padding: 15px 20px;
+            background-color: var(--teams-dark);
+            border-bottom: 1px solid var(--teams-border);
+            font-weight: 600;
+            color: var(--teams-purple);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Seção de Operador */
+        .user-selector-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background-color: #111;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--teams-border);
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-selector-container label {
+            font-size: 11px;
+            color: #aaa;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .user-select {
+            background-color: var(--teams-gray);
+            color: white;
+            border: 1px solid var(--teams-border);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+            flex: 1;
+        }
+
+        .user-select:focus {
+            border-color: var(--teams-purple);
+        }
+
+        .badge-role {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            background-color: #555;
+            color: #fff;
+        }
+        .role-gestor { background-color: #8b0000; color: #ffcccc; }
+        .role-vendas { background-color: #2b5797; color: #eff4ff; }
+        .role-suporte { background-color: #00828a; color: #e6ffff; }
+
+        .crm-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        /* Seção Logs */
+        .logs-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+
+        .logs-body {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #d4d4d4;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .log-entry {
+            line-height: 1.4;
+            padding: 4px 6px;
+            border-radius: 3px;
+            background-color: rgba(255,255,255,0.03);
+            border-left: 3px solid #8a8a8a;
+        }
+        .log-entry.success { border-left-color: #2e8b57; color: #a3e2bc; }
+        .log-entry.error { border-left-color: #cd5c5c; color: #f29c9c; }
+        .log-entry.info { border-left-color: #4682b4; color: #a9d4f5; }
+
+        .log-time {
+            color: #7a7a7a;
+            margin-right: 5px;
+        }
+        
+        .log-user {
+            color: #eebb55;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        /* Cards do CRM */
+        .lead-card {
+            background-color: var(--teams-gray);
+            border: 1px solid var(--teams-border);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .lead-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .lead-name {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .lead-status {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-prospecocao { background-color: #d2691e; color: white; }
+        .status-contato { background-color: #4682b4; color: white; }
+        .status-proposta { background-color: #9370db; color: white; }
+        .status-ganho { background-color: #2e8b57; color: white; }
+        .status-perdido { background-color: #cd5c5c; color: white; }
+
+        .lead-contact {
+            font-size: 13px;
+            color: #5b5fc7;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .lead-company {
+            font-size: 13px;
+            color: #b3b3b3;
+            margin-bottom: 6px;
+        }
+
+        .lead-meta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 6px;
+        }
+
+        .lead-owner, .lead-date, .lead-updated {
+            font-size: 11px;
+            color: #8a8a8a;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .lead-updated {
+            color: #b5a4e3;
+        }
+
+        .lead-notes {
+            font-size: 12px;
+            background-color: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 4px;
+            color: #cccccc;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="teams-nav">
+            <div class="nav-item"><div class="nav-icon">🔔</div>Atividade</div>
+            <div class="nav-item active"><div class="nav-icon">💬</div>Chat</div>
+            <div class="nav-item"><div class="nav-icon">👥</div>Equipes</div>
+            <div class="nav-item"><div class="nav-icon">📅</div>Calendário</div>
+        </div>
+
+        <div class="teams-channels">
+            <div class="channels-header">Chat</div>
+            <div class="chat-list-item">
+                <div class="avatar">CB</div>
+                <div>
+                    <div style="font-weight: 600;">ChatBot CRM</div>
+                    <div style="font-size: 12px; color: #a0a0a0;">Disponível</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="teams-chat-area">
+            <div class="chat-header">
+                <div class="avatar">CB</div>
+                <div>
+                    <div style="font-weight: 600;">ChatBot CRM</div>
+                    <div style="font-size: 12px; color: #44b678;">• Agente Virtual de Vendas</div>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Digite a opção ou 'cancelar' para abortar..." autofocus>
+                <button onclick="handleUserInput()">Enviar</button>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="crm-section">
+                <div class="crm-header">
+                    <span>Painel CRM Interno</span>
+                    <span style="font-size: 12px; color: #aaa;" id="leadCount">Leads: 0</span>
+                </div>
+                
+                <div class="user-selector-container">
+                    <label for="currentUser">Operador Conectado:</label>
+                    <div class="user-row">
+                        <select id="currentUser" class="user-select" onchange="handleUserChange()">
+                            <option value="Felipe Schmidt" data-role="Vendedor">Felipe Schmidt (Vendas)</option>
+                            <option value="Ana Costa" data-role="Gestor">Ana Costa (Gestor)</option>
+                            <option value="Bruno Alves" data-role="Suporte">Bruno Alves (Suporte)</option>
+                        </select>
+                        <span id="userRoleBadge" class="badge-role role-vendas">Vendedor</span>
+                    </div>
+                </div>
+
+                <div class="crm-body" id="crmBody"></div>
+            </div>
+
+            <div class="logs-section">
+                <div class="logs-header">
+                    <span>📋 Logs de Ações (CRM API)</span>
+                </div>
+                <div class="logs-body" id="logsBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let crmLeads = [
+            { id: 1, nome: "Carlos Souza", contato: "carlos@tech.com", empresa: "Tech Inovações", status: "Prospecção", obs: "Demonstrou interesse no plano Premium.", criadoPor: "Ana Costa", criadoEm: "20/05/2026, 14:32:15", atualizadoPor: null, atualizadoEm: null },
+            { id: 2, nome: "Amanda Lima", contato: "(11) 98888-7777", empresa: "Logística Brasil", status: "Contato Inicial", obs: "Ligar de volta na próxima terça-feira.", criadoPor: "Ana Costa", criadoEm: "21/05/2026, 09:15:40", atualizadoPor: null, atualizadoEm: null }
+        ];
+
+        let botState = {
+            currentStep: "MENU",
+            tempData: {}
+        };
+
+        const menuText = `Olá! Sou o seu assistente de CRM integrado ao Teams. Digite o número da opção que deseja executar:<br><br>
+        <b>1</b> - Criar um lead<br>
+        <b>2</b> - Excluir um lead<br>
+        <b>3</b> - Registrar uma observação no lead<br>
+        <b>4</b> - Alterar o status de um lead<br>
+        <b>5</b> - Consultar o ID de um lead pelo nome<br>
+        <b>6</b> - Alterar/Atualizar dados de um lead<br><br>
+        <small style="color: #aaa;">💡 A qualquer momento, digite <b>cancelar</b> ou <b>0</b> para voltar ao menu.</small>`;
+
+        window.onload = function() {
+            renderCRM();
+            updateRoleBadge();
+            addLog("info", "Sistema inicializado. Linha do tempo e registros de auditoria ativos.");
+            appendMessage("bot", menuText);
+        };
+
+        function getActiveUser() {
+            return document.getElementById("currentUser").value;
+        }
+
+        function capitalizarNome(str) {
+            return str.toLowerCase().split(' ').map(palavra => {
+                return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+            }).join(' ');
+        }
+
+        function getActiveRole() {
+            const select = document.getElementById("currentUser");
+            return select.options[select.selectedIndex].getAttribute("data-role");
+        }
+
+        function updateRoleBadge() {
+            const badge = document.getElementById("userRoleBadge");
+            const role = getActiveRole();
+            badge.innerText = role;
+            badge.className = "badge-role " + (role === "Gestor" ? "role-gestor" : role === "Vendedor" ? "role-vendas" : "role-suporte");
+        }
+
+        function reiniciarChatParaNovoUsuario() {
+            const chatMessages = document.getElementById("chatMessages");
+            chatMessages.innerHTML = "";
+
+            botState = {
+                currentStep: "MENU",
+                tempData: {}
+            };
+
+            const nomeUsuario = getActiveUser();
+            const saudacaoNova = `Olá, <b>${nomeUsuario}</b>! Chat reiniciado para sua nova sessão.<br><br>` + menuText;
+            appendMessage("bot", saudacaoNova);
+        }
+
+        function handleUserChange() {
+            updateRoleBadge();
+            renderCRM(); 
+            addLog("info", `Alterou a sessão para o usuário com privilégio de [${getActiveRole()}].`);
+            reiniciarChatParaNovoUsuario();
+        }
+
+        function addLog(type, text) {
+            const logsBody = document.getElementById("logsBody");
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const userName = getActiveUser();
+            const role = getActiveRole();
+
+            const logDiv = document.createElement("div");
+            logDiv.className = `log-entry ${type}`;
+            logDiv.innerHTML = `<span class="log-time">[${timeStr}]</span><span class="log-user">&lt;${userName} (${role})&gt;</span> ${text}`;
+
+            logsBody.appendChild(logDiv);
+            logsBody.scrollTop = logsBody.scrollHeight;
+        }
+
+        function marcarAtualizacao(lead) {
+            const now = new Date();
+            const dataStr = now.toLocaleDateString('pt-BR');
+            const horaStr = now.toTimeString().split(' ')[0];
+            
+            lead.atualizadoEm = `${dataStr}, ${horaStr}`;
+            lead.atualizadoPor = getActiveUser();
+        }
+
+        function validarPermissao(lead) {
+            const role = getActiveRole();
+            const user = getActiveUser();
+            if (role === "Gestor") return true;
+            if (lead.criadoPor === user) return true;
+            return false;
+        }
+
+        function normalizarContato(str) {
+            return str.replace(/[^a-zA-Z0-9@.]/g, "").toLowerCase();
+        }
+
+        function obterPercentualSimilaridade(s1, s2) {
+            s1 = s1.toLowerCase().trim();
+            s2 = s2.toLowerCase().trim();
+            
+            let custos = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let ultimoValor = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i == 0) custos[j] = j;
+                    else {
+                        if (j > 0) {
+                            let novoValor = custos[j - 1];
+                            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                                novoValor = Math.min(Math.min(novoValor, ultimoValor), custos[j]) + 1;
+                            custos[j - 1] = ultimoValor;
+                            ultimoValor = novoValor;
+                        }
+                    }
+                }
+                if (i > 0) custos[s2.length] = ultimoValor;
+            }
+            
+            let maiorComprimento = Math.max(s1.length, s2.length);
+            if (maiorComprimento === 0) return 1.0;
+            return (maiorComprimento - custos[s2.length]) / maiorComprimento;
+        }
+
+        function renderCRM() {
+            const crmBody = document.getElementById("crmBody");
+            const leadCount = document.getElementById("leadCount");
+            crmBody.innerHTML = "";
+            leadCount.innerText = `Leads: ${crmLeads.length}`;
+
+            crmLeads.forEach(lead => {
+                let statusClass = "status-prospecocao";
+                if(lead.status === "Contato Inicial") statusClass = "status-contato";
+                if(lead.status === "Proposta") statusClass = "status-proposta";
+                if(lead.status === "Ganho") statusClass = "status-ganho";
+                if(lead.status === "Perdido") statusClass = "status-perdido";
+
+                const temAcesso = validarPermissao(lead);
+
+                const exibicaoContato = temAcesso ? lead.contato : "<span style='color: #cd5c5c; font-style: italic;'>🔒 [Acesso Restrito]</span>";
+                const exibicaoEmpresa = temAcesso ? lead.empresa : "<span style='color: #8a8a8a; font-style: italic;'>[Acesso Restrito]</span>";
+                const exibicaoNotas = temAcesso ? (lead.obs || 'Nenhuma observação registrada.') : "<span style='color: #8a8a8a; font-style: italic;'>Apenas o proprietário ou gestores podem ler estas notas.</span>";
+
+                let htmlAtualizacao = '';
+                if(lead.atualizadoEm && lead.atualizadoPor) {
+                    htmlAtualizacao = `<div class="lead-updated">🔄 Alterado em: <b>${lead.atualizadoEm}</b> por <b>${lead.atualizadoPor}</b></div>`;
+                }
+
+                crmBody.innerHTML += `
+                    <div class="lead-card" style="${!temAcesso ? 'opacity: 0.85; border-color: #333;' : ''}">
+                        <div class="lead-header">
+                            <span class="lead-name">[ID: ${lead.id}] ${lead.nome}</span>
+                            <span class="lead-status ${statusClass}">${lead.status}</span>
+                        </div>
+                        <div class="lead-meta-info">
+                            <div class="lead-owner">👤 Criador: <b>${lead.criadoPor}</b></div>
+                            <div class="lead-date">📅 Criado em: <b>${lead.criadoEm}</b></div>
+                            ${htmlAtualizacao}
+                        </div>
+                        <div class="lead-contact">📞/✉️ ${exibicaoContato}</div>
+                        <div class="lead-company">🏢 ${exibicaoEmpresa}</div>
+                        <div class="lead-notes">📝 ${exibicaoNotas}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function appendMessage(sender, text) {
+            const chatMessages = document.getElementById("chatMessages");
+            const messageDiv = document.createElement("div");
+            
+            let senderClass = sender;
+            if (sender === "bot-error" || sender === "bot-warning") {
+                senderClass = "bot " + sender;
+            }
+            
+            messageDiv.className = `message ${senderClass}`;
+            messageDiv.innerHTML = `
+                <div class="avatar">${sender.startsWith('user') ? 'VC' : 'CB'}</div>
+                <div class="message-content">${text}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleUserInput() {
+            const inputEl = document.getElementById("userInput");
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            appendMessage("user", text);
+            inputEl.value = "";
+
+            processBotLogic(text);
+        }
+
+        document.getElementById("userInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") handleUserInput();
+        });
+
+        function irParaContato(nomeForm) {
+            botState.tempData.nome = nomeForm;
+            botState.currentStep = "AWAIT_CREATE_CONTACT";
+            appendMessage("bot", `Nome validado e formatado: <b>${nomeForm}</b>.<br>Agora, informe o <b>Contato</b> (E-mail com '@' ou número de Telefone):`);
+        }
+
+        function irParaEmpresa() {
+    botState.currentStep = "AWAIT_CREATE_COMPANY";
+    appendMessage("bot", `Contato definido: <b>${botState.tempData.contato}</b>.<br>O Lead possui uma <b>Empresa</b>? (Sim/Não)`);
+}
+
+        function finalizarCriacaoLead(empresaForm) {
+            const now = new Date();
+            const dataStr = now.toLocaleDateString('pt-BR');
+            const horaStr = now.toTimeString().split(' ')[0];
+            const novoId = crmLeads.length > 0 ? Math.max(...crmLeads.map(l => l.id)) + 1 : 1;
+
+            const novoLead = {
+                id: novoId,
+                nome: botState.tempData.nome,
+                contato: botState.tempData.contato,
+                empresa: empresaForm,
+                status: "Prospecção",
+                obs: "",
+                criadoPor: getActiveUser(),
+                criadoEm: `${dataStr}, ${horaStr}`,
+                atualizadoPor: null,
+                atualizadoEm: null
+            };
+
+            crmLeads.push(novoLead);
+            addLog("success", `Lead [ID: ${novoId}] ${novoLead.nome} criado com success.`);
+            renderCRM();
+
+            botState.currentStep = "MENU";
+            botState.tempData = {};
+            appendMessage("bot", `🎉 <b>Lead cadastrado com sucesso!</b><br>Ele já está visível no painel interno sob o <b>ID ${novoId}</b>.`);
+            appendMessage("bot", menuText);
+        }
+
+        function processBotLogic(input) {
+            const currentUser = getActiveUser();
+            const inputLower = input.toLowerCase().trim();
+
+            if (botState.currentStep !== "MENU" && (inputLower === "cancelar" || inputLower === "sair" || inputLower === "0")) {
+                addLog("info", `Operação no estado [${botState.currentStep}] cancelada pelo usuário.`);
+                botState.currentStep = "MENU";
+                botState.tempData = {};
+                appendMessage("bot", "🔄 <b>Operação cancelada!</b> Voltamos ao início.");
+                appendMessage("bot", menuText);
+                return;
+            }
+
+            switch (botState.currentStep) {
+                case "MENU":
+                    if (input === "1") {
+                        botState.currentStep = "AWAIT_CREATE_NAME";
+                        addLog("info", "Iniciou o fluxo de criação de Lead.");
+                        appendMessage("bot", "Perfeito! Vamos criar um lead. Qual é o <b>Nome completo</b> do contato?");
+                    } else if (input === "2") {
+                        botState.currentStep = "AWAIT_DELETE_ID";
+                        addLog("info", "Iniciou o fluxo de exclusão de Lead.");
+                        appendMessage("bot", "Qual é o <b>ID do Lead</b> que você deseja excluir? (Veja no painel lateral)");
+                    } else if (input === "3") {
+                        botState.currentStep = "AWAIT_NOTE_ID";
+                        addLog("info", "Iniciou inserção de notas em Lead.");
+                        appendMessage("bot", "Em qual <b>ID de Lead</b> você quer registrar a observação?");
+                    } else if (input === "4") {
+                        botState.currentStep = "AWAIT_STATUS_ID";
+                        addLog("info", "Iniciou alteração de status de Lead.");
+                        appendMessage("bot", "De qual <b>ID de Lead</b> você deseja alterar o status?");
+                    } else if (input === "5") {
+                        botState.currentStep = "AWAIT_SEARCH_NAME";
+                        addLog("info", "Iniciou a consulta de ID por nome.");
+                        appendMessage("bot", "Por favor, digite o <b>Nome completo</b> do lead que você deseja descobrir o ID:");
+                    } else if (input === "6") {
+                        botState.currentStep = "AWAIT_UPDATE_ID";
+                        addLog("info", "Iniciou o fluxo de atualização cadastral de Lead.");
+                        appendMessage("bot", "Qual é o <b>ID do Lead</b> que você quer alterar as informações estruturais?");
+                    } else {
+                        addLog("error", `Entrada inválida no Menu Principal: "${input}"`);
+                        // Mensagens devidamente separadas
+                        appendMessage("bot-error", "🛑 <b>COMANDO INVÁLIDO!</b><br>A opção informada não existe. Por favor, escolha um número válido de <b>1 a 6</b>.");
+                        appendMessage("bot", menuText);
+                    }
+                    break;
+
+                case "AWAIT_SEARCH_NAME":
+                    const nomeBuscaFormatado = capitalizarNome(input).trim();
+                    const nomeBuscaMinusculo = nomeBuscaFormatado.toLowerCase();
+                    const leadEncontrado = crmLeads.find(l => l.nome.toLowerCase().trim() === nomeBuscaMinusculo);
+
+                    if (leadEncontrado) {
+                        addLog("success", `Consulta realizada com sucesso. ID ${leadEncontrado.id} retornado para o nome "${leadEncontrado.nome}".`);
+                        appendMessage("bot", `🔍 <b>Lead Localizado!</b><br>O ID do lead <b>${leadEncontrado.nome}</b> é: <b style="color: var(--teams-purple); font-size: 16px;">${leadEncontrado.id}</b>.`);
+                        appendMessage("bot", menuText);
+                    } else {
+                        addLog("error", `Consulta de ID falhou. Nenhum lead encontrado com o nome "${nomeBuscaFormatado}".`);
+                        appendMessage("bot-error", `❌ <b>NENHUM REGISTRO ENCONTRADO!</b><br>Não localizei nenhum lead cadastrado com o nome "<b>${nomeBuscaFormatado}</b>" no sistema.`);
+                        appendMessage("bot", menuText);
+                    }
+                    botState.currentStep = "MENU";
+                    break;
+
+                case "AWAIT_CREATE_NAME":
+                    const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/;
+                    if (!nameRegex.test(input)) {
+                        addLog("error", `Tentativa de criação com nome inválido: "${input}"`);
+                        appendMessage("bot-error", "⚠️ <b>NOME INVÁLIDO CONTÉM CARACTERES PROIBIDOS!</b><br>Por favor, digite apenas letras e espaços estruturais. Redigite o <b>Nome completo</b>:");
+                        return;
+                    }
+
+                    const nomeFormatado = capitalizarNome(input).trim();
+                    const nomeExiste = crmLeads.some(l => l.nome.toLowerCase().trim() === nomeFormatado.toLowerCase());
+                    if (nomeExiste) {
+                        addLog("error", `Criação barrada: Já existe um Lead registrado exatamente com o nome "${nomeFormatado}".`);
+                        appendMessage("bot-error", `❌ <b>ERRO DE DUPLICIDADE CRÍTICA!</b><br>O lead <b>${nomeFormatado}</b> já consta no banco de dados e registros duplicados não são permitidos.<br>Operação abortada automaticamente.`);
+                        appendMessage("bot", menuText);
+                        botState.currentStep = "MENU";
+                        return;
+                    }
+
+                    let leadSimilar = null;
+                    for (let lead of crmLeads) {
+                        let sim = obterPercentualSimilaridade(nomeFormatado, lead.nome);
+                        if (sim >= 0.80) {
+                            leadSimilar = lead;
+                            break;
+                        }
+                    }
+
+                    if (leadSimilar) {
+                        botState.tempData.nomePendente = nomeFormatado;
+                        botState.currentStep = "AWAIT_NAME_SIMILAR_CONFIRMATION";
+                        addLog("info", `Alerta de similaridade gerado: "${nomeFormatado}" se assemelha a "${leadSimilar.nome}"`);
+                        appendMessage("bot-warning", `⚠️ <b>ALERTA DE SIMILARIDADE DE CADASTRO!</b><br>O nome "<b>${nomeFormatado}</b>" é 80%+ semelhante ao lead existente: "<b>${leadSimilar.nome}</b>" (ID: ${leadSimilar.id}).<br><br><b>Deseja ignorar o alerta e prosseguir?</b><br>Digite <b>Sim</b> para forçar o avanço ou <b>Não</b> para alterar.`);
+                        return;
+                    }
+
+                    irParaContato(nomeFormatado);
+                    break;
+
+                case "AWAIT_NAME_SIMILAR_CONFIRMATION":
+                    const confNome = input.toLowerCase().trim();
+                    if (confNome === "sim" || confNome === "s") {
+                        addLog("info", "Usuário ignorou aviso de similaridade e optou por continuar.");
+                        const nomeParaSalvar = botState.tempData.nomePendente;
+                        botState.tempData.nomePendente = null;
+                        irParaContato(nomeParaSalvar);
+                    } else if (confNome === "não" || confNome === "nao" || confNome === "n") {
+                        botState.currentStep = "AWAIT_CREATE_NAME";
+                        addLog("info", "Usuário voltou atrás devido à similaridade de nomes.");
+                        appendMessage("bot", "Entendido. Vamos corrigir. Por favor, informe o <b>novo Nome completo</b> correto para o lead:");
+                    } else {
+                        appendMessage("bot-error", "⚠️ <b>COMANDO INVÁLIDO!</b><br>Responda estritamente com <b>Sim</b> para prosseguir ou <b>Não</b> para revisar.");
+                    }
+                    break;
+
+                case "AWAIT_CREATE_CONTACT":
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const phoneRegex = /^[0-9\s()+-]{8,20}$/;
+                    const isEmail = emailRegex.test(input);
+                    const isPhone = phoneRegex.test(input) && (input.replace(/\D/g, "").length >= 8);
+
+                    if (!isEmail && !isPhone) {
+                        addLog("error", `Tentativa de contato inválido: "${input}"`);
+                        appendMessage("bot-error", "⚠️ <b>SINTAXE DE CONTATO INVÁLIDA!</b><br>Formatos aceitos: E-mail (ex@dominio.com) ou Telefone válido com DDD contendo no mínimo 8 dígitos.<br><br>Por favor, redigite a informação:");
+                        return;
+                    }
+
+                    botState.tempData.contato = input;
+                    const contatoNormalizado = normalizarContato(input);
+                    const contatoExiste = crmLeads.some(l => normalizarContato(l.contato) === contatoNormalizado);
+                    if (contatoExiste) {
+                        botState.currentStep = "AWAIT_CONTACT_CONFIRMATION";
+                        addLog("info", `Alerta de contato existente gerado para o valor: "${input}"`);
+                        appendMessage("bot-warning", `⚠️ <b>ALERTA: ESTE CONTATO JÁ EXISTE NO BANCO!</b><br>O contato <b>${input}</b> já está associado a outro registro ativo.<br><br><b>A informação está correta e deseja prosseguir com a duplicidade de chaves?</b><br>Responda <b>Sim</b> ou <b>Não</b>.`);
+                    } else {
+                        irParaEmpresa();
+                    }
+                    break;
+
+                case "AWAIT_CONTACT_CONFIRMATION":
+                    const confCont = input.toLowerCase().trim();
+                    if(confCont === "sim" || confCont === "s") {
+                        addLog("info", "Usuário assumiu o risco de duplicidade de contato de forma voluntária.");
+                        irParaEmpresa();
+                    } else if (confCont === "não" || confCont === "nao" || confCont === "n") {
+                        botState.currentStep = "AWAIT_CREATE_CONTACT";
+                        addLog("info", "Usuário optou por trocar o contato duplicado.");
+                        appendMessage("bot", "Certo. Por favor, digite um <b>novo Contato corporativo exclusivo</b>:");
+                    } else {
+                        appendMessage("bot-error", "⚠️ <b>COMANDO INVÁLIDO!</b><br>Responda estritamente com <b>Sim</b> para manter o contato duplicado ou <b>Não</b> para alterá-lo.");
+                    }
+                    break;
+
+                case "AWAIT_CREATE_COMPANY":
+    const respEmpresa = input.toLowerCase().trim();
+    
+    if (respEmpresa === "sim" || respEmpresa === "s") {
+        botState.currentStep = "AWAIT_NAME_COMPANY";
+        appendMessage("bot", "Qual é o nome da <b>Empresa</b>?");
+    } else if (respEmpresa === "não" || respEmpresa === "nao" || respEmpresa === "n") {
+        finalizarCriacaoLead("Sem empresa");
+    } else {
+        appendMessage("bot-error", "⚠️ Resposta inválida! Por favor, responda apenas <b>Sim</b> ou <b>Não</b>.");
+    }
+    break;
+
+case "AWAIT_NAME_COMPANY":
+    if (input.trim() === "") {
+        appendMessage("bot-error", "⚠️ O nome da empresa não pode estar vazio. Por favor, digite o nome:");
+    } else {
+        finalizarCriacaoLead(input.trim());
+    }
+    break;
+                case "AWAIT_DELETE_ID":
+                    const idDel = parseInt(input);
+                    const idxDel = crmLeads.findIndex(l => l.id === idDel);
+                    if (idxDel !== -1) {
+                        const leadAlvo = crmLeads[idxDel];
+                        if (!validarPermissao(leadAlvo)) {
+                            addLog("error", `Tentativa ilegal de exclusão do Lead ID ${idDel} (Sem privilégios de escrita).`);
+                            appendMessage("bot-error", "🔒 <b>ACESSO NEGADO POR VIOLAÇÃO DE PERMISSÃO!</b><br>Você não é o criador original deste lead e seu cargo atual não possui hierarquia operacional para expurgar este registro.");
+                            appendMessage("bot", menuText);
+                            botState.currentStep = "MENU";
+                            return;
+                        }
+                        crmLeads.splice(idxDel, 1);
+                        addLog("success", `Lead [ID: ${idDel}] foi permanentemente deletado.`);
+                        renderCRM();
+                        appendMessage("bot", `🗑️ <b>Lead ID ${idDel} removido!</b> Registro expurgado do banco do simulador com sucesso.`);
+                        appendMessage("bot", menuText);
+                    } else {
+                        addLog("error", `ID informado para exclusão inexistente: "${input}"`);
+                        appendMessage("bot-error", "❌ <b>IDENTIFICADOR INEXISTENTE!</b><br>Nenhum lead correspondente ao ID informado foi localizado no painel.");
+                        appendMessage("bot", menuText);
+                    }
+                    botState.currentStep = "MENU";
+                    break;
+
+                case "AWAIT_NOTE_ID":
+                    const idNota = parseInt(input);
+                    const leadNota = crmLeads.find(l => l.id === idNota);
+                    if (leadNota) {
+                        if (!validarPermissao(leadNota)) {
+                            addLog("error", `Bloqueio de escrita de observações em Lead alheio. ID: ${idNota}`);
+                            appendMessage("bot-error", "🔒 <b>ACESSO RESTRITO ÀS NOTAS!</b><br>O registro de anotações internas é exclusivo ao proprietário do Lead ou contas com privilégio de Gestor.");
+                            appendMessage("bot", menuText);
+                            botState.currentStep = "MENU";
+                            return;
+                        }
+                        botState.tempData.leadAlvo = leadNota;
+                        botState.currentStep = "AWAIT_NOTE_TEXT";
+                        appendMessage("bot", `Lead selecionado: <b>${leadNota.nome}</b>.<br>Por favor, digite o texto da <b>Observação</b> que deseja anexar ao histórico dele:`);
+                    } else {
+                        addLog("error", `ID informado para notas inexistente: "${input}"`);
+                        appendMessage("bot-error", "❌ <b>ID NÃO LOCALIZADO!</b><br>Operação de anotação cancelada por inconsistência nos dados de entrada.");
+                        appendMessage("bot", menuText);
+                        botState.currentStep = "MENU";
+                    }
+                    break;
+
+                case "AWAIT_NOTE_TEXT":
+                    if (!input.trim()) {
+                        appendMessage("bot-error", "⚠️ <b>TEXTO EM BRANCO DETECTADO!</b><br>O banco de auditoria não aceita notas vazias. Digite uma observação válida:");
+                        return;
+                    }
+                    const lNota = botState.tempData.leadAlvo;
+                    lNota.obs = input.trim();
+                    marcarAtualizacao(lNota);
+                    addLog("success", `Registrou nota interna no Lead ID ${lNota.id}.`);
+                    renderCRM();
+                    appendMessage("bot", "📝 <b>Nota salva!</b> O painel CRM e o rastreador de modificações foram atualizados.");
+                    appendMessage("bot", menuText);
+                    botState.currentStep = "MENU";
+                    botState.tempData = {};
+                    break;
+
+                case "AWAIT_STATUS_ID":
+                    const idStat = parseInt(input);
+                    const leadStat = crmLeads.find(l => l.id === idStat);
+                    if (leadStat) {
+                        if (!validarPermissao(leadStat)) {
+                            addLog("error", `Bloqueio de pipeline em Lead alheio. ID: ${idStat}`);
+                            appendMessage("bot-error", "🔒 <b>PIPELINE BLOQUEADO PARA ESTE OPERADOR!</b><br>Mudanças no funil de vendas exigem posse sobre o registro ou nível hierárquico elevado.");
+                            appendMessage("bot", menuText);
+                            botState.currentStep = "MENU";
+                            return;
+                        }
+                        botState.tempData.leadAlvo = leadStat;
+                        botState.currentStep = "AWAIT_STATUS_SELECTION";
+                        appendMessage("bot", `Alterando pipeline de <b>${leadStat.nome}</b>.<br>Escolha o número do novo Status desejado:<br><br><b>1</b> - Prospecção<br><b>2</b> - Contato Inicial<br><b>3</b> - Proposta<br><b>4</b> - Ganho 🎉<br><b>5</b> - Perdido ❌`);
+                    } else {
+                        addLog("error", `ID informado para status inexistente: "${input}"`);
+                        appendMessage("bot-error", "❌ <b>ID DE FUNIL INEXISTENTE NO MAPA ATUAL!</b><br>Certifique-se do número olhando a tabela lateral.");
+                        appendMessage("bot", menuText);
+                        botState.currentStep = "MENU";
+                    }
+                    break;
+
+                case "AWAIT_STATUS_SELECTION":
+                    const lStat = botState.tempData.leadAlvo;
+                    let novoStatus = "";
+                    if (input === "1") novoStatus = "Prospecção";
+                    else if (input === "2") novoStatus = "Contato Inicial";
+                    else if (input === "3") novoStatus = "Proposta";
+                    else if (input === "4") novoStatus = "Ganho";
+                    else if (input === "5") novoStatus = "Perdido";
+                    else {
+                        appendMessage("bot-error", "⚠️ <b>ENTRADA FORA DO ESCOPO!</b><br>Escolha de forma estrita um número de <b>1 a 5</b> baseado no submenu vigente:");
+                        return;
+                    }
+                    
+                    const statusAntigo = lStat.status;
+                    lStat.status = novoStatus;
+                    marcarAtualizacao(lStat);
+                    addLog("success", `Alterou status do Lead ${lStat.id}: de "${statusAntigo}" para "${novoStatus}"`);
+                    renderCRM();
+                    appendMessage("bot", `💼 <b>Status modificado!</b> Estágio de funil alterado para <b>${novoStatus}</b> com sucesso.`);
+                    appendMessage("bot", menuText);
+                    botState.currentStep = "MENU";
+                    botState.tempData = {};
+                    break;
+
+                case "AWAIT_UPDATE_ID":
+                    const idUpd = parseInt(input);
+                    const leadUpd = crmLeads.find(l => l.id === idUpd);
+                    if (leadUpd) {
+                        if (!validarPermissao(leadUpd)) {
+                            addLog("error", `Bloqueio de atualização cadastral de Lead alheio. ID: ${idUpd}`);
+                            appendMessage("bot-error", "🔒 <b>BLOQUEIO ESTRUTURAL DE CADASTRO!</b><br>Alterações em registros mapeados por terceiros foram revogadas nesta sessão de operador.");
+                            appendMessage("bot", menuText);
+                            botState.currentStep = "MENU";
+                            return;
+                        }
+                        botState.tempData.leadAlvo = leadUpd;
+                        botState.currentStep = "AWAIT_UPDATE_FIELD_SELECTION";
+                        appendMessage("bot", `Editando dados de: <b>${leadUpd.nome}</b>.<br>Qual campo estrutural você deseja reescrever?<br><br><b>1</b> - Nome completo do Contato<br><b>2</b> - Dados de Contato (Telefone/Email)<br><b>3</b> - Empresa Vinculada`);
+                    } else {
+                        addLog("error", `ID de lead não localizado para update estrutural: "${input}"`);
+                        appendMessage("bot-error", "❌ <b>NENHUM LEAD RESPONDE AO ID SOLICITADO!</b><br>Verifique as chaves de identificação ativas e tente novamente.");
+                        appendMessage("bot", menuText);
+                        botState.currentStep = "MENU";
+                    }
+                    break;
+
+                case "AWAIT_UPDATE_FIELD_SELECTION":
+                    if(input === "1" || input === "2" || input === "3") {
+                        botState.tempData.campoEscolhido = input;
+                        botState.currentStep = "AWAIT_UPDATE_NEW_VALUE";
+                        appendMessage("bot", "Perfeito. Agora, digite o <b>novo valor definitivo</b> que substituirá o registro atual:");
+                    } else {
+                        appendMessage("bot-error", "⚠️ <b>SELEÇÃO INVÁLIDA!</b><br>Envie <b>1</b> para modificar Nome, <b>2</b> para Contato ou <b>3</b> para Empresa.");
+                    }
+                    break;
+
+                case "AWAIT_UPDATE_NEW_VALUE":
+                    const lUpd = botState.tempData.leadAlvo;
+                    const campo = botState.tempData.campoEscolhido;
+                    const valorNovo = input.trim();
+
+                    if(!valorNovo) {
+                        appendMessage("bot-error", "⚠️ <b>ENTRADA EM BRANCO SÃO REJEITADAS!</b><br>Insira o novo valor definitivo para alteração cadastral:");
+                        return;
+                    }
+
+                    if(campo === "1") {
+                        const rName = /^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/;
+                        if (!rName.test(valorNovo)) {
+                            appendMessage("bot-error", "⚠️ <b>FORMATO DE NOME REJEITADO!</b><br>O campo aceita apenas caracteres alfabéticos normais e espaços. Digite novamente:");
+                            return;
+                        }
+                        lUpd.nome = capitalizarNome(valorNovo);
+                    } else if(campo === "2") {
+                        const rEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        const rPhone = /^[0-9\s()+-]{8,20}$/;
+                        if(!rEmail.test(valorNovo) && !(rPhone.test(valorNovo) && valorNovo.replace(/\D/g, "").length >= 8)) {
+                            appendMessage("bot-error", "⚠️ <b>FORMATO DE CONTATO REJEITADO!</b><br>O dado fornecido não atende a nenhum padrão de validação de e-mail ou telefone. Redigite:");
+                            return;
+                        }
+                        lUpd.contato = valorNovo;
+                    } else if(campo === "3") {
+                        lUpd.empresa = valorNovo;
+                    }
+
+                    marcarAtualizacao(lUpd);
+                    addLog("success", `Atualizou o cadastro estrutural (campo ${campo}) do Lead ID ${lUpd.id}.`);
+                    renderCRM();
+                    appendMessage("bot", "⚙️ <b>Cadastro Atualizado!</b> Modificação realizada e rastreada no painel do CRM.");
+                    appendMessage("bot", menuText);
+                    botState.currentStep = "MENU";
+                    botState.tempData = {};
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
+Exibindo teste.html…
